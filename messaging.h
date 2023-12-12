@@ -9,11 +9,8 @@
 
 #include <capnp/serialize.h>
 
-#include "./cpp/log.capnp.h"
+#include "log.capnp.h"
 
-#ifdef __APPLE__
-#define CLOCK_BOOTTIME CLOCK_MONOTONIC
-#endif
 
 #define MSG_MULTIPLE_PUBLISHERS 100
 
@@ -72,7 +69,7 @@ public:
   SubMaster(const std::vector<const char *> &service_list, const std::vector<const char *> &poll = {},
             const char *address = nullptr, const std::vector<const char *> &ignore_alive = {});
   void update(int timeout = 1000);
-  void update_msgs(uint64_t current_time, const std::vector<std::pair<std::string, cereal::Event::Reader>> &messages);
+  void update_msgs(uint64_t current_time, const std::vector<std::pair<std::string, Event::Reader>> &messages);
   inline bool allAlive(const std::vector<const char *> &service_list = {}) { return all_(service_list, false, true); }
   inline bool allValid(const std::vector<const char *> &service_list = {}) { return all_(service_list, true, false); }
   inline bool allAliveAndValid(const std::vector<const char *> &service_list = {}) { return all_(service_list, true, true); }
@@ -85,7 +82,7 @@ public:
   bool valid(const char *name) const;
   uint64_t rcv_frame(const char *name) const;
   uint64_t rcv_time(const char *name) const;
-  cereal::Event::Reader &operator[](const char *name) const;
+  Event::Reader &operator[](const char *name) const;
 
 private:
   bool all_(const std::vector<const char *> &service_list, bool valid, bool alive);
@@ -100,8 +97,8 @@ class MessageBuilder : public capnp::MallocMessageBuilder {
 public:
   MessageBuilder() = default;
 
-  cereal::Event::Builder initEvent(bool valid = true) {
-    cereal::Event::Builder event = initRoot<cereal::Event>();
+    Event::Builder initEvent(bool valid = true) {
+    Event::Builder event = initRoot<Event>();
     struct timespec t;
     clock_gettime(CLOCK_BOOTTIME, &t);
     uint64_t current_time = t.tv_sec * 1000000000ULL + t.tv_nsec;

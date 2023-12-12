@@ -1,0 +1,2 @@
+do remove cereal namespace then compile it again coz i am just doing practicles no serious stuff intended!!!(Done)
+make cythonic python bindings and make them callable from python (that may be the road to understanding the scons!!!)

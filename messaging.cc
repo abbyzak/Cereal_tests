@@ -4,9 +4,6 @@
 #include "messaging.h"
 #include "impl_msgq.h"
 
-
-
-
 bool messaging_use_fake(){
   char* fake_enabled = std::getenv("CEREAL_FAKE");
   return fake_enabled != NULL;

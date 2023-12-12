@@ -47,7 +47,7 @@ struct SubMaster::SubMessage {
   bool is_polled = false;
   capnp::FlatArrayMessageReader *msg_reader = nullptr;
   AlignedBuffer aligned_buf;//recall it but fr now it is just a fancy name for something like canpnp array
-  cereal::Event::Reader event;
+  Event::Reader event;
 };
 
 SubMaster::SubMaster(const std::vector<const char *> &service_list, const std::vector<const char *> &poll,
@@ -88,7 +88,7 @@ void SubMaster::update(int timeout) {
 
   uint64_t current_time = nanos_since_boot();
 
-  std::vector<std::pair<std::string, cereal::Event::Reader>> messages;
+  std::vector<std::pair<std::string, Event::Reader>> messages;
 
   for (auto s : sockets) {
     Message *msg = s->receive(true);
@@ -101,13 +101,13 @@ void SubMaster::update(int timeout) {
     options.traversalLimitInWords = kj::maxValue; // Don't limit
     m->msg_reader = new (m->allocated_msg_reader) capnp::FlatArrayMessageReader(m->aligned_buf.align(msg), options);
     delete msg;
-    messages.push_back({m->name, m->msg_reader->getRoot<cereal::Event>()});
+    messages.push_back({m->name, m->msg_reader->getRoot<Event>()});
   }
 
   update_msgs(current_time, messages);
 }
 
-void SubMaster::update_msgs(uint64_t current_time, const std::vector<std::pair<std::string, cereal::Event::Reader>> &messages){
+void SubMaster::update_msgs(uint64_t current_time, const std::vector<std::pair<std::string, Event::Reader>> &messages){
   if (++frame == UINT64_MAX) frame = 1;
 
   for (auto &kv : messages) {
@@ -176,7 +176,7 @@ uint64_t SubMaster::rcv_time(const char *name) const {
   return services_.at(name)->rcv_time;
 }
 
-cereal::Event::Reader &SubMaster::operator[](const char *name) const {
+Event::Reader &SubMaster::operator[](const char *name) const {
   return services_.at(name)->event;
 }
 SubMaster::~SubMaster() {
